@@ -1,18 +1,31 @@
 <template>
   <div class="container">
-    <div class="drag-area" :class="{ 'is-drag-over': isDragOver }" @click="handleDragAreaClick"
-      @dragenter="handleDragEnter" @dragleave="handleDragLeave" @dragover="handleDragOver" @drop="handleDrop"
-      v-if="!imgSrc">
-      <input type="file" style="display: none;" @click="handleInputClick" @change="handleInputChange" ref="input">
+    <div
+      class="drag-area"
+      :class="{ 'is-drag-over': isDragOver }"
+      @click="handleDragAreaClick"
+      @dragenter="handleDragEnter"
+      @dragleave="handleDragLeave"
+      @dragover="handleDragOver"
+      @drop="handleDrop"
+      v-if="!imgSrc"
+    >
+      <input
+        type="file"
+        style="display: none"
+        @click="handleInputClick"
+        @change="handleInputChange"
+        ref="input"
+      />
       <div>点击或拖拽图片到此处上传</div>
     </div>
-    <img :src="imgSrc" alt="" v-else>
+    <img :src="imgSrc" alt="" v-else />
   </div>
   <button @click="handleReset">重置</button>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
 const imgSrc = ref<string>();
 const isDragOver = ref<boolean>(false);
@@ -34,11 +47,13 @@ const processFile = (file?: File | null) => {
   if (!file || !file.type.includes('image')) return;
 
   const fileReader = new FileReader();
-  fileReader.addEventListener('load', function onLoad() {
-    imgSrc.value = this.result as string || '';
+  fileReader.addEventListener('loadend', function onLoadEnd() {
+    if (typeof this.result === 'string') {
+      imgSrc.value = this.result;
+    }
   });
   fileReader.readAsDataURL(file);
-}
+};
 
 const handleDrop = (e: DragEvent) => {
   e.preventDefault();
@@ -47,13 +62,13 @@ const handleDrop = (e: DragEvent) => {
   processFile(file);
 };
 
-const handleDragAreaClick = (e: Event) => {
+const handleDragAreaClick = () => {
   input.value?.click();
 };
 
 const handleInputClick = (e: Event) => {
   e.stopPropagation();
-}
+};
 
 const handleInputChange = (e: Event) => {
   const file = (e.target as HTMLInputElement | null)?.files?.item(0);
@@ -62,7 +77,7 @@ const handleInputChange = (e: Event) => {
 
 const handleReset = () => {
   imgSrc.value = '';
-}
+};
 </script>
 
 <style scoped>
